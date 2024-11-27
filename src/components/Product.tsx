@@ -26,7 +26,7 @@ import { useNavigation } from '@react-navigation/native';
 import CustomImage from './CustomImage';
 
 
-function Product({ productWidth }): React.JSX.Element {
+function Product({ productWidth, productData }): React.JSX.Element {
 
     const dispatch = useAppDispatch()
     const {width} = useWindowDimensions()
@@ -46,7 +46,8 @@ function Product({ productWidth }): React.JSX.Element {
             <View>
                 <CustomImage
                     style={[styles.image, {width:calculatedWidth, height:calculatedWidth} ]}
-                    source={{uri:"https://cdn.thewirecutter.com/wp-content/media/2024/05/running-shoes-2048px-9718.jpg"}}
+                    source={{uri:productData?.image}}
+                    resizeMode="contain"
                 />
                 <View style={[styles.shadow, { position: "absolute", bottom: 10, right: 10, backgroundColor: colors.background, borderRadius: 20 }]} >
                     <IconButton

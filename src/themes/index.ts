@@ -55,7 +55,8 @@ export function useTheme(){
     const [colors, SetColors] = useState(Light);
     const [activeTheme, SetactiveTheme] = useState("Light");
 
-    const theme = useAppSelector((state) => state.setting.theme)
+    // const theme = useAppSelector((state) => state.setting.theme)
+    const theme = "Light"
 
     useEffect(() => {
 
