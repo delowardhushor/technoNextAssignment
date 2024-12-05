@@ -12,7 +12,7 @@ import {
     Image,
     useWindowDimensions,
 } from 'react-native';
-import { useAppDispatch } from '../redux/storeHooks';
+import { useAppDispatch, useAppSelector } from '../redux/storeHooks';
 import { globalStyles, useTheme } from '../themes';
 import { UpdateTheme } from '../redux/settingSlice';
 
@@ -24,6 +24,10 @@ import IconButton from './IconButton';
 import Chip from './Chip';
 import { useNavigation } from '@react-navigation/native';
 import CustomImage from './CustomImage';
+import _ from 'lodash'
+import { addToCart } from '../redux/cartSlice';
+import { CheckInCart } from '../uti/uti';
+import { useSelector } from 'react-redux';
 
 
 function Product({ productWidth, productData }): React.JSX.Element {
@@ -38,6 +42,20 @@ function Product({ productWidth, productData }): React.JSX.Element {
 
     console.log("calculatedWidth", calculatedWidth, width)
 
+    const InCart = useAppSelector(state => CheckInCart(state, productData?.id))
+
+    const HandleCart = () => {
+        dispatch(
+            addToCart({
+              id: productData.id,
+              title: productData.title,
+              image: productData.image,
+              price: productData.price,
+              quantity: 1,
+            })
+        )
+    }
+
     return (
         <Pressable 
             style={[globalStyles.shadow, styles.product, {width:calculatedWidth}]} 
@@ -49,62 +67,43 @@ function Product({ productWidth, productData }): React.JSX.Element {
                     source={{uri:productData?.image}}
                     resizeMode="contain"
                 />
-                <View style={[styles.shadow, { position: "absolute", bottom: 10, right: 10, backgroundColor: colors.background, borderRadius: 20 }]} >
-                    <IconButton
-                        icon="heart-outline"
-                        buttonSize="sm"
-                        // size={20}
-                        // style={{
-                        //     height:35,
-                        //     width:35
-                        // }}
-                    />
-                </View>
-                <Chip 
-                    label="New" 
-                    style={[globalStyles.shadow, { position: "absolute", top: 10, right: 10, backgroundColor: colors.background, borderRadius: 20 }]}
-                />
-                <Chip 
-                    label="-10%" 
-                    background={colors.base} 
-                    color={colors.white} 
-                    style={[globalStyles.shadow, { position: "absolute", top: 10, left: 10, borderRadius: 20 }]} 
-                />
+                
             </View>
             <View style={{padding:10}} >
-                <CustomText size={14} type="bold" numberOfLines={1} >Dress asdf asd asd asd sadsa asd</CustomText>
+                <CustomText size={14} type="bold" numberOfLines={1} >
+                    {productData?.title}
+                </CustomText>
                 <Spacing vertical={8} />
                 <View style={{ flexDirection: 'row', alignItems:'center',}} >
-                    {[1,1,1,1,1].map((ele, index) => 
+                    {_.times(5).map((ele, index) => 
                         <Ionicons
                             name="star"
                             size={12}
-                            color={index < 3 ? colors.base : colors.border}
+                            color={index < productData?.rating?.rate ? colors.base : colors.border}
                             style={{marginRight:2}}
                         />
                     )}
                     <Spacing horizontal={5} />
 
                     <CustomText size={10} color={colors.lightFont} >
-                        4.8 (12K Reviews)
+                        {productData?.rating?.rate} ({productData?.rating?.count} Reviews)
                     </CustomText>
                 </View>
                 <Spacing vertical={10} />
                 <View style={{ flexDirection: 'row', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap' }} >
                     <View style={{ flex:1 }} >
-                        <CustomText size={10} style={{textDecorationLine:'line-through'}} color={colors.lightFont} >$150</CustomText>
-                        <Spacing horizontal={5} />
-                        <CustomText size={16} type="bold" color={colors.font} >$120</CustomText>
+                        <CustomText size={16} type="bold" color={colors.font} >${productData?.price}</CustomText>
                     </View>
                     <Chip
-                        label="Add Cart"
-                        leftIcon='bag-outline'
+                        label={InCart ? "Added" : "Add Cart"}
+                        leftIcon={InCart ? 'checkmark-circle' : 'bag-outline'}
                         active
                         style={{
                             borderColor:colors.base,
                             borderWidth:1,
                             marginRight:0
                         }}
+                        onPress={HandleCart}
                         // color={colors.base}
                     />
                     {/* <IconButton

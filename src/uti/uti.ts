@@ -1,3 +1,4 @@
+import { RootState } from "../redux/store";
 
 
 export function  ConvertSectoDay(n : number){
@@ -28,4 +29,6 @@ export function AddTralingZero (text : number){
       return text
     }
 }
+
+export const CheckInCart = (state: RootState, productId: number) => state.cart.items.some((item) => item.id === productId);
 

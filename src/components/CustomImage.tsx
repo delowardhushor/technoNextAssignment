@@ -22,7 +22,7 @@ const CustomImage = ({ style, source, resizeMode, resizeMethod }) => {
 
   const memorizedImage = useMemo(() => (
       <RNImage
-        style={[style, {backgroundColor:colors.backgroundSecondary, overflow: "hidden"}]}
+        style={[style, {backgroundColor:colors.background, overflow: "hidden"}]}
         source={source}
         onLoadStart={handleLoadStart}
         onLoadEnd={handleLoadEnd}

@@ -5,7 +5,7 @@ import {
     StyleSheet,
     View
 } from 'react-native';
-import { useAppDispatch } from '../redux/storeHooks';
+import { useAppDispatch, useAppSelector } from '../redux/storeHooks';
 import { globalStyles, useTheme } from '../themes';
 
 import CustomImage from '../components/CustomImage';
@@ -17,6 +17,7 @@ import Spacing from '../components/Spacing';
 import Ionicons from "react-native-vector-icons/Ionicons"
 import Chip from '../components/Chip';
 import Button from '../components/Button';
+import { removeFromCart, updateQuantity } from '../redux/cartSlice';
 
 function Cart({ navigation, route }): React.JSX.Element {
 
@@ -25,6 +26,12 @@ function Cart({ navigation, route }): React.JSX.Element {
 
     const styles = useMemo(() => GetStyles(colors), [activeTheme])
 
+    const cartItems = useAppSelector(state => state?.cart?.items)
+
+    const cartTotal =  useMemo(() => {
+        return cartItems.reduce((acc, curr) => acc + (curr?.quantity * curr?.price), 0)
+    }, [cartItems])
+
     return (
         <SafeAreaWrapper>
 
@@ -32,7 +39,7 @@ function Cart({ navigation, route }): React.JSX.Element {
 
             <ScrollView style={styles.innerSection} >
 
-                {[1,1,1,1,1,1].map(ele => 
+                {cartItems.map(ele => 
 
                     <View style={[styles.cart, globalStyles.shadow]} >
 
@@ -43,7 +50,8 @@ function Cart({ navigation, route }): React.JSX.Element {
                                 borderRadius:15,
                                 overflow: 'hidden'
                             }}
-                            source={{uri:"https://cdn.thewirecutter.com/wp-content/media/2024/05/running-shoes-2048px-9718.jpg"}}
+                            source={{uri:ele?.image}}
+                            resizeMode="contain"
                         />
 
                         <Spacing horizontal={10} />
@@ -52,46 +60,46 @@ function Cart({ navigation, route }): React.JSX.Element {
 
                             <View style={globalStyles.rowCenterBetween} >
                                 <CustomText style={{flex:1}} numberOfLines={1} size={16} type="bold" >
-                                    Nice Shoes dsfg sdf dsfsd fsdfssdf sdfsfsdf
+                                    {ele?.title}
                                 </CustomText>
                                 <Spacing horizontal={5} />
                                 <IconButton 
                                     icon="close-outline"
+                                    onPress={() => dispatch(removeFromCart( ele?.id))}
                                 />
                             </View>
                             {/* <Spacing vertical={10} /> */}
 
-                            <View style={globalStyles.rowCenter} >
-                                <CustomText>Color: <CustomText type="bold" >RED</CustomText></CustomText>
-                                <Spacing horizontal={5} />
-                                <CustomText type="bold" >|</CustomText>
-                                <Spacing horizontal={5} />
-                                <CustomText>Size: <CustomText type="bold" >M</CustomText></CustomText>
-                            </View>
+                            
                             <Spacing vertical={10} />
                             <View style={globalStyles.rowCenterBetween} >
                                 <View style={globalStyles.rowCenterEnd} >
-                                    <CustomText size={14} style={{textDecorationLine:'line-through'}} color={colors.lightFont} >$18</CustomText>
 
-                                    <Spacing horizontal={5} />
-
-                                    <CustomText size={18} type="bold" color={colors.base} >$20</CustomText>
+                                    <CustomText size={18} type="bold" color={colors.base} >${ele?.price}</CustomText>
                                 </View>
 
                                 <View style={styles.incDecBtn} >
-                                    <Pressable style={styles.incBtn} >
+                                    <Pressable 
+                                        style={styles.incBtn} 
+                                        onPress={() => dispatch(updateQuantity({ id: ele?.id, quantity: ele?.quantity > 2 ? ele?.quantity - 1 : 1}))}
+                                    >
                                         <Ionicons 
                                             name="remove"
                                             size={14}
                                             color={colors.font}
+                                            
                                         />
                                     </Pressable>
                                     <Spacing horizontal={5} />
                                     <CustomText size={14} type='bold' >
-                                        1
+                                        {ele?.quantity}
                                     </CustomText>
                                     <Spacing horizontal={5} />
-                                    <Pressable style={styles.incBtn} >
+                                    <Pressable
+                                         style={styles.incBtn} 
+                                        onPress={() => dispatch(updateQuantity({ id: ele?.id, quantity: ele?.quantity + 1}))}
+
+                                    >
                                         <Ionicons 
                                             name="add"
                                             size={14}
@@ -113,7 +121,7 @@ function Cart({ navigation, route }): React.JSX.Element {
                 <View>
                     <CustomText type="bold" size={12} >Subtotal</CustomText>
                     {/* <Spacing vertical={5} /> */}
-                    <CustomText type="bold" size={18} color={colors.base} >$19.23</CustomText>
+                    <CustomText type="bold" size={18} color={colors.base} >${(cartTotal).toFixed(2)}</CustomText>
                 </View>
                 <Button 
                     label="Proceed to Checkout"
