@@ -19,28 +19,32 @@ import IconButton from './IconButton';
 import Spacing from './Spacing';
 import Badge from './Badge';
 import CustomText from './CustomText';
+import { useNavigation } from '@react-navigation/native';
 
 
-function Header({}): React.JSX.Element {
+function Header({location}): React.JSX.Element {
 
     const dispatch = useAppDispatch()
     const {colors, activeTheme} = useTheme()
     const styles = useMemo(() => GetStyles(colors), [activeTheme])
+    const navigation = useNavigation();
+
 
     return (
         <View style={[styles.header]} >
             <CustomText>LOGO</CustomText>
             <View style={{flexDirection:'row'}} >
-                <IconButton icon="search-outline" />
+
+                <IconButton 
+                    icon="location-outline" 
+                    onPress={() => navigation.push('Map', location)}
+                />
+
                 <Spacing horizontal={5} />
+
                 <View>
                     <IconButton icon="bag-handle-outline" />
                     <Badge value={5} />
-                </View>
-                <Spacing horizontal={5} />
-                <View>
-                    <IconButton icon="notifications-outline" />
-                    <Badge value={2} />
                 </View>
             </View>
         </View>

@@ -1,4 +1,5 @@
 import { RootState } from "../redux/store";
+import { PermissionsAndroid, Platform } from 'react-native';
 
 
 export function  ConvertSectoDay(n : number){
@@ -31,4 +32,20 @@ export function AddTralingZero (text : number){
 }
 
 export const CheckInCart = (state: RootState, productId: number) => state.cart.items.some((item) => item.id === productId);
+
+
+export async function RequestLocationPermission(){
+  if (Platform.OS === 'android') {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Location Access Required',
+        message: 'This app needs to access your location',
+        buttonPositive:'OK'
+      }
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  }
+  return true;
+}
 

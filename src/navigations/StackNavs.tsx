@@ -26,6 +26,7 @@ import ProductDetails from '../screens/ProductDetails';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Cart from '../screens/Cart';
 import Checkout from '../screens/Checkout';
+import MapScreen from '../screens/Map';
 
 
 const Stack = createNativeStackNavigator();
@@ -61,6 +62,7 @@ function StackNavs(): React.JSX.Element {
             <Stack.Screen name="BottomTabNavs" component={BottomTabNavs} />
             {/* <Stack.Screen name="Home" component={Home} /> */}
             <Stack.Screen name="Checkout" component={Checkout} />
+            <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="ProductDetails" component={ProductDetails} />
             <Stack.Screen name="Categories" component={Categories} />
           </Stack.Group>
