@@ -32,6 +32,7 @@ import IconButton from '../components/IconButton';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { RequestLocationPermission } from '../uti/uti';
 import Geolocation from '@react-native-community/geolocation';
+import moment from 'moment';
 
 const { TimestampModule } = NativeModules;
 
@@ -61,7 +62,7 @@ function Home({ navigation, route }): React.JSX.Element {
         const subscription = DeviceEventEmitter.addListener('TimestampEvent', (newTimestamp: string) => {
             setLocalTime(newTimestamp);
 
-    console.log("localTime", newTimestamp)
+            console.log("localTime", newTimestamp)
 
         });
 
@@ -95,6 +96,10 @@ function Home({ navigation, route }): React.JSX.Element {
 
     const styles = useMemo(() => GetStyles(colors), [activeTheme])
 
+    const formattedTimestamp = localTime
+        ? moment(Number(localTime)).format('MMMM Do YYYY, h:mm:ss a')
+        : 'Waiting for timestamp...';
+
     return (
         <SafeAreaWrapper>
 
@@ -102,49 +107,30 @@ function Home({ navigation, route }): React.JSX.Element {
                 location={location}
             />
 
-            <View
-                style={{
-                    flexDirection: 'row',
-                    justifyContent:'space-between',
-                    alignItems:'center',
-                    marginBottom: 10,
-                    paddingHorizontal: 15,
-                    paddingVertical: 5,
-                    backgroundColor: colors.background,
-                    shadowColor: "#000",
-                    shadowOffset: {
-                        width: 0,
-                        height: 1,
-                    },
-                    shadowOpacity: 0.20,
-                    shadowRadius: 1.41,
-                    elevation: 2,
-                }}
-            >
-                
-                <CustomText>Products</CustomText>
-
-                <TouchableOpacity
-                    style={{
-                        height:40,
-                        width:40,
-                        justifyContent:'center',
-                        alignItems:'center',
-                        borderColor: colors.border,
-                    }}
-                    onPress={() => setSortOrder(sortOrder == 'asc' ? 'desc' : 'asc')}
-                >
-                    <FontAwesome5 
-                        name={sortOrder == 'asc' ? "sort-alpha-down" : "sort-alpha-up"}
-                        size={18}
-                        color={colors.font}
-                    />
-                </TouchableOpacity>
-
-            </View>
-
+            <CustomText style={{textAlign:'center'}} type='bold' >Local Time: {formattedTimestamp}</CustomText>
+                    
             <FlatList
                 style={globalStyles.globalPadding}
+                ListHeaderComponent={
+                    <View
+                        style={styles.productTitleWrapper}
+                    >
+                        
+                        <CustomText>Products</CustomText>
+
+                        <TouchableOpacity
+                            style={styles.sortBtn}
+                            onPress={() => setSortOrder(sortOrder == 'asc' ? 'desc' : 'asc')}
+                        >
+                            <FontAwesome5 
+                                name={sortOrder == 'asc' ? "sort-alpha-down" : "sort-alpha-up"}
+                                size={18}
+                                color={colors.font}
+                            />
+                        </TouchableOpacity>
+
+                    </View>
+                }
                 data={data}
                 numColumns={2}
                 renderItem={({ item }) =>
@@ -163,6 +149,32 @@ const GetStyles = (colors: any) => StyleSheet.create({
 
     innerSection: {
         paddingHorizontal: 15,
+    },
+
+    productTitleWrapper:{
+        flexDirection: 'row',
+        justifyContent:'space-between',
+        alignItems:'center',
+        marginBottom: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+        backgroundColor: colors.background,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.20,
+        shadowRadius: 1.41,
+        elevation: 2,
+    },
+
+    sortBtn:{
+        height:40,
+        width:40,
+        justifyContent:'center',
+        alignItems:'center',
+        borderColor: colors.border,
     }
 
 });
