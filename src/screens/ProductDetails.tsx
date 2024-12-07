@@ -13,7 +13,7 @@ Pressable,
   ImageBackground,
   FlatList,
 } from 'react-native';
-import { useAppDispatch } from '../redux/storeHooks';
+import { useAppDispatch, useAppSelector } from '../redux/storeHooks';
 import { globalStyles, useTheme } from '../themes';
 import { UpdateTheme } from '../redux/settingSlice';
 import CustomImage from '../components/CustomImage';
@@ -28,8 +28,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import Button from '../components/Button';
 import ProductCarousel from '../components/ProductCarousel';
 import Product from '../components/Product';
-import { AddProductToHistory } from '../uti/uti';
+import { AddProductToHistory, CheckInCart, HandleCart } from '../uti/uti';
 import { addToHistory } from '../redux/historySlice';
+import { updateQuantity } from '../redux/cartSlice';
 
 
 function ProductDetails({navigation, route} : {navigation:any, route: any}): React.JSX.Element {
@@ -60,6 +61,9 @@ function ProductDetails({navigation, route} : {navigation:any, route: any}): Rea
         dispatch(addToHistory(productData));
 
       }, []);
+
+    const InCart = useAppSelector(state => CheckInCart(state, productData?.id))
+
 
     return (
         <View style={{flex:1, backgroundColor:colors.background}} >
@@ -197,32 +201,29 @@ function ProductDetails({navigation, route} : {navigation:any, route: any}): Rea
                         <CustomText type='bold' >
                             Price
                         </CustomText>
-                        <View style={globalStyles.rowCenterEnd} >
-                            <CustomText size={14} style={{textDecorationLine:'line-through'}} color={colors.lightFont} >$18</CustomText>
-
-                            <Spacing horizontal={5} />
-
-                            <CustomText size={18} type="bold" color={colors.base} >$20</CustomText>
-                        </View>
+                        <CustomText size={18} type="bold" color={colors.base} >${productData?.price}</CustomText>
                     </View>
                     <Spacing horizontal={50} />
                     <View style={globalStyles.rowCenter} >
-                    {true ?
+                    {InCart ?
                         <View style={[styles.cartBtn, globalStyles.shadow]} >
                             <IconButton 
                                 icon='remove' 
                                 style={styles.cartIcon} 
                                 color={colors.white}
                                 // size={30}
+                                onPress={() => dispatch(updateQuantity({ id: InCart?.id, quantity: InCart?.quantity > 2 ? InCart?.quantity - 1 : 1}))}
+
                             />
                             <Spacing horizontal={10} />
-                            <CustomText color={colors.white} type="bold" >2</CustomText>
+                            <CustomText color={colors.white} type="bold" >{InCart?.quantity}</CustomText>
                             <Spacing horizontal={10} />
                             <IconButton 
                                 icon='add' 
                                 style={styles.cartIcon} 
                                 color={colors.white}
                                 // size={30}
+                                onPress={() => dispatch(updateQuantity({ id: InCart?.id, quantity: InCart?.quantity + 1}))}
                             />
                         </View>
                     :
@@ -231,14 +232,12 @@ function ProductDetails({navigation, route} : {navigation:any, route: any}): Rea
                             active
                             leftIcon="bag-handle"
                             style={[globalStyles.shadow, {width:120}]}
+                            onPress={() => HandleCart(productData)}
+
                         />
                     }
-                    <Spacing horizontal={10} />
-
-                    <IconButton 
-                        icon="heart-outline"
-                        style={globalStyles.shadow}
-                    />
+                    
+                    
                     </View>
                     
                 </View>

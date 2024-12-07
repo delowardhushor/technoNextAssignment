@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     DeviceEventEmitter,
     FlatList,
@@ -14,9 +15,9 @@ import {
     useColorScheme,
     View,
 } from 'react-native';
-import { useAppDispatch } from '../redux/storeHooks';
+import { useAppDispatch, useAppSelector } from '../redux/storeHooks';
 import { globalStyles, useTheme } from '../themes';
-import { UpdateTheme } from '../redux/settingSlice';
+import { UpdateLocation, UpdateTheme } from '../redux/settingSlice';
 
 import Header from '../components/Header';
 import HomeCarousel from '../components/HomeCarousel';
@@ -33,20 +34,20 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { RequestLocationPermission } from '../uti/uti';
 import Geolocation from '@react-native-community/geolocation';
 import moment from 'moment';
+import { useNetInfo } from '@react-native-community/netinfo';
+import { setCachedProducts } from '../redux/cacheSlice';
 
 const { TimestampModule } = NativeModules;
 
 
-function Home({ navigation, route }): React.JSX.Element {
+function Home({ navigation, route } : {navigation:any, route: any}): React.JSX.Element {
 
     const dispatch = useAppDispatch()
 
     const { colors, activeTheme } = useTheme()
 
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-    const { data, isLoading, error, refetch } = useFetchProductsQuery(sortOrder);
-
-    const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+    const { data : products, isLoading, error, refetch } = useFetchProductsQuery(sortOrder);
 
     const [localTime, setLocalTime] = useState<string>('');
 
@@ -55,22 +56,22 @@ function Home({ navigation, route }): React.JSX.Element {
     }, [])
 
     useEffect(() => {
-        // Start the timestamp updates
+
         TimestampModule.startTimestampUpdates();
 
-        // Listen to the timestamp events
-        const subscription = DeviceEventEmitter.addListener('TimestampEvent', (newTimestamp: string) => {
-            setLocalTime(newTimestamp);
 
-            console.log("localTime", newTimestamp)
+        const subscription = DeviceEventEmitter.addListener('TimestampEvent', (newTimestamp: string) => {
+            
+            setLocalTime(newTimestamp);
 
         });
 
-        // Cleanup on unmount
+
         return () => {
-            TimestampModule.stopTimestampUpdates(); // Stop updates
-            subscription.remove(); // Remove event listener
+            TimestampModule.stopTimestampUpdates(); 
+            subscription.remove(); 
         };
+
     }, []);
 
 
@@ -83,7 +84,7 @@ function Home({ navigation, route }): React.JSX.Element {
         Geolocation.getCurrentPosition(
         (position) => {
             const { latitude, longitude } = position.coords;
-            setLocation({ latitude, longitude });
+            dispatch(UpdateLocation({ latitude, longitude }))
         },
         (error) => {
             Alert.alert('Error', error.message);
@@ -96,6 +97,21 @@ function Home({ navigation, route }): React.JSX.Element {
 
     const styles = useMemo(() => GetStyles(colors), [activeTheme])
 
+    const netInfo = useNetInfo()
+
+    const isOffline = !netInfo.isConnected;
+
+    const cachedProducts = useAppSelector(state=> state.cache.products);
+
+
+    useEffect(() => {
+        if (!isOffline && products) {
+            dispatch(setCachedProducts(products));
+        }
+    }, [isOffline, products, dispatch]);
+
+    const productList = isOffline ? cachedProducts : products;
+
     const formattedTimestamp = localTime
         ? moment(Number(localTime)).format('MMMM Do YYYY, h:mm:ss a')
         : 'Waiting for timestamp...';
@@ -103,43 +119,46 @@ function Home({ navigation, route }): React.JSX.Element {
     return (
         <SafeAreaWrapper>
 
-            <Header 
-                location={location}
-            />
+            <Header />
 
             <CustomText style={{textAlign:'center'}} type='bold' >Local Time: {formattedTimestamp}</CustomText>
-                    
-            <FlatList
-                style={globalStyles.globalPadding}
-                ListHeaderComponent={
-                    <View
-                        style={styles.productTitleWrapper}
-                    >
-                        
-                        <CustomText>Products</CustomText>
 
-                        <TouchableOpacity
-                            style={styles.sortBtn}
-                            onPress={() => setSortOrder(sortOrder == 'asc' ? 'desc' : 'asc')}
-                        >
-                            <FontAwesome5 
-                                name={sortOrder == 'asc' ? "sort-alpha-down" : "sort-alpha-up"}
-                                size={18}
-                                color={colors.font}
-                            />
-                        </TouchableOpacity>
+            <View
+                style={styles.productTitleWrapper}
+            >
+                
+                <CustomText>Products</CustomText>
 
-                    </View>
-                }
-                data={data}
-                numColumns={2}
-                renderItem={({ item }) =>
-                    <Product 
-                        productData={item}
+                <TouchableOpacity
+                    style={styles.sortBtn}
+                    onPress={() => setSortOrder(sortOrder == 'asc' ? 'desc' : 'asc')}
+                >
+                    <FontAwesome5 
+                        name={sortOrder == 'asc' ? "sort-alpha-down" : "sort-alpha-up"}
+                        size={18}
+                        color={colors.font}
                     />
-                }
-                showsHorizontalScrollIndicator={false}
-            />
+                </TouchableOpacity>
+
+            </View>
+
+            {isLoading ?
+                <View style={{flex:1, alignItems:'center', justifyContent:'center'}} >
+                    <ActivityIndicator />
+                </View>
+            :   
+                <FlatList
+                    style={globalStyles.globalPadding}
+                    data={productList}
+                    numColumns={2}
+                    renderItem={({ item }) =>
+                        <Product 
+                            productData={item}
+                        />
+                    }
+                    showsHorizontalScrollIndicator={false}
+                />
+            }
 
         </SafeAreaWrapper>
     );

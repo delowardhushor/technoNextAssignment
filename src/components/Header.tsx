@@ -22,7 +22,7 @@ import CustomText from './CustomText';
 import { useNavigation } from '@react-navigation/native';
 
 
-function Header({location}): React.JSX.Element {
+function Header(): React.JSX.Element {
 
     const dispatch = useAppDispatch()
     const {colors, activeTheme} = useTheme()
@@ -39,7 +39,7 @@ function Header({location}): React.JSX.Element {
 
                 <IconButton 
                     icon="location-outline" 
-                    onPress={() => navigation.push('Map', location)}
+                    onPress={() => navigation.navigate('Map')}
                 />
 
                 <Spacing horizontal={5} />

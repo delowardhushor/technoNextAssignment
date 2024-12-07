@@ -5,6 +5,8 @@ import historySlice from './historySlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { combineReducers } from 'redux';
+import cacheSlice from './cacheSlice';
+import settingSlice from './settingSlice';
 
 const persistConfig = {
   key: 'root',
@@ -16,6 +18,8 @@ export const rootReducer = combineReducers({
 
   cart: cartSlice,
   history: historySlice,
+  cache: cacheSlice,
+  setting: settingSlice,
   [productApi.reducerPath]: productApi.reducer,
   
   

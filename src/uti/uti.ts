@@ -1,6 +1,7 @@
-import { RootState } from "../redux/store";
+import { RootState, store } from "../redux/store";
 import { PermissionsAndroid, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { addToCart, removeFromCart } from "../redux/cartSlice";
 
 
 export function  ConvertSectoDay(n : number){
@@ -32,7 +33,7 @@ export function AddTralingZero (text : number){
     }
 }
 
-export const CheckInCart = (state: RootState, productId: number) => state.cart.items.some((item) => item.id === productId);
+export const CheckInCart = (state: RootState, productId: number) => state.cart.items.find((item) => item.id === productId);
 
 
 export async function RequestLocationPermission(){
@@ -78,3 +79,23 @@ export async function AddProductToHistory(product: any){
   await SaveViewedProducts(updatedHistory);
   
 };
+
+export function HandleCart (productData: any) {
+
+  const storeData = store.getState()
+
+  const InCart = CheckInCart(storeData, productData?.id)
+
+  InCart ?
+    store.dispatch(removeFromCart(productData?.id))
+  :
+    store.dispatch(
+          addToCart({
+              id: productData.id,
+              title: productData.title,
+              image: productData.image,
+              price: productData.price,
+              quantity: 1,
+          })
+      )
+}

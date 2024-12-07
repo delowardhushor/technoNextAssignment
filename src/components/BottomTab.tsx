@@ -57,6 +57,9 @@ function BottomTab({ state, descriptors, navigation }) {
             if(route.name === 'Cart'){
                 return 'shopping-cart'
             }
+            if(route.name === 'Map'){
+              return 'map'
+          }
             return 'home'  // default icon name when no icon is found
         }
 

@@ -26,11 +26,11 @@ import { useNavigation } from '@react-navigation/native';
 import CustomImage from './CustomImage';
 import _ from 'lodash'
 import { addToCart, removeFromCart } from '../redux/cartSlice';
-import { CheckInCart } from '../uti/uti';
+import { CheckInCart, HandleCart } from '../uti/uti';
 import { useSelector } from 'react-redux';
 
 
-function Product({ productWidth, productData }): React.JSX.Element {
+function Product({ productWidth, productData } : {productWidth : Number | null, productData : any }): React.JSX.Element {
 
     const dispatch = useAppDispatch()
     const {width} = useWindowDimensions()
@@ -40,24 +40,10 @@ function Product({ productWidth, productData }): React.JSX.Element {
 
     const calculatedWidth = productWidth || ((width - 45)/2)
 
-    console.log("calculatedWidth", calculatedWidth, width)
 
     const InCart = useAppSelector(state => CheckInCart(state, productData?.id))
 
-    const HandleCart = () => {
-        InCart ?
-            dispatch(removeFromCart(productData?.id))
-        :
-            dispatch(
-                addToCart({
-                    id: productData.id,
-                    title: productData.title,
-                    image: productData.image,
-                    price: productData.price,
-                    quantity: 1,
-                })
-            )
-    }
+    
 
     return (
         <Pressable 
@@ -106,7 +92,7 @@ function Product({ productWidth, productData }): React.JSX.Element {
                             borderWidth:1,
                             marginRight:0
                         }}
-                        onPress={HandleCart}
+                        onPress={() => HandleCart(productData)}
                         // color={colors.base}
                     />
                     {/* <IconButton

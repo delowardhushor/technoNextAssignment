@@ -1,13 +1,18 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import SafeAreaWrapper from '../components/SafeAreaWrapper';
+import { useAppDispatch, useAppSelector } from '../redux/storeHooks';
+import Header from '../components/Header';
 
 const MapScreen = ({ route }: { route: any }) => {
   
-  const { latitude, longitude } = route.params;
+
+  const {latitude, longitude  } = useAppSelector(state => state?.setting?.location)
 
   return (
-    <View style={styles.container}>
+    <SafeAreaWrapper>
+      <Header />
       {latitude && longitude ? (
         <MapView
           style={styles.map}
@@ -23,7 +28,7 @@ const MapScreen = ({ route }: { route: any }) => {
       ) : (
         <Text>Location not available</Text>
       )}
-    </View>
+    </SafeAreaWrapper>
   );
 };
 

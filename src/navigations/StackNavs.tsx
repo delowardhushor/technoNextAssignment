@@ -60,15 +60,8 @@ function StackNavs(): React.JSX.Element {
         >
           <Stack.Group>
             <Stack.Screen name="BottomTabNavs" component={BottomTabNavs} />
-            {/* <Stack.Screen name="Home" component={Home} /> */}
-            <Stack.Screen name="Checkout" component={Checkout} />
-            <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="ProductDetails" component={ProductDetails} />
-            <Stack.Screen name="Categories" component={Categories} />
           </Stack.Group>
-          {/* <Stack.Group screenOptions={{ presentation: 'modal' }} >
-            <Stack.Screen name="ProductDetails" component={ProductDetails} />
-          </Stack.Group> */}
         </Stack.Navigator>
         
       </NavigationContainer>
