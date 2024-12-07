@@ -38,6 +38,7 @@ import { useNetInfo } from '@react-native-community/netinfo';
 import { setCachedProducts } from '../redux/cacheSlice';
 import { startTimestampUpdates, onTimestampUpdate, stopTimestampUpdates } from '../uti/TimestampModuleWrapper';
 
+const { TimestampModule } = NativeModules;
 
 function Home({ navigation, route } : {navigation:any, route: any}): React.JSX.Element {
 
@@ -49,21 +50,22 @@ function Home({ navigation, route } : {navigation:any, route: any}): React.JSX.E
     const { data : products, isLoading, error, refetch } = useFetchProductsQuery(sortOrder);
 
 
-    const [timestamp, setTimestamp] = useState<number | null>(null);
+    const [timestamp, setTimestamp] = useState<string | null>(null);
 
     useEffect(() => {
 
-        startTimestampUpdates;
+        TimestampModule.startTimestampUpdates();
+        const subscription = DeviceEventEmitter.addListener('TimestampEvent', (newTimestamp: string) => {
+            
+            setTimestamp(newTimestamp);
 
-        const unsubscribe = onTimestampUpdate((ts) => {
-            setTimestamp(ts);
         });
 
         return () => {
-            unsubscribe();
-            stopTimestampUpdates();
+            TimestampModule.stopTimestampUpdates(); 
+            subscription.remove(); 
         };
-        
+
     }, []);
 
     useEffect(() => {
