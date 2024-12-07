@@ -36,8 +36,7 @@ import Geolocation from '@react-native-community/geolocation';
 import moment from 'moment';
 import { useNetInfo } from '@react-native-community/netinfo';
 import { setCachedProducts } from '../redux/cacheSlice';
-
-const { TimestampModule } = NativeModules;
+import { startTimestampUpdates, onTimestampUpdate, stopTimestampUpdates } from '../uti/TimestampModuleWrapper';
 
 
 function Home({ navigation, route } : {navigation:any, route: any}): React.JSX.Element {
@@ -49,30 +48,27 @@ function Home({ navigation, route } : {navigation:any, route: any}): React.JSX.E
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const { data : products, isLoading, error, refetch } = useFetchProductsQuery(sortOrder);
 
-    const [localTime, setLocalTime] = useState<string>('');
+
+    const [timestamp, setTimestamp] = useState<number | null>(null);
+
+    useEffect(() => {
+
+        startTimestampUpdates;
+
+        const unsubscribe = onTimestampUpdate((ts) => {
+            setTimestamp(ts);
+        });
+
+        return () => {
+            unsubscribe();
+            stopTimestampUpdates();
+        };
+        
+    }, []);
 
     useEffect(() => {
         fetchLocation()
     }, [])
-
-    useEffect(() => {
-
-        TimestampModule.startTimestampUpdates();
-
-
-        const subscription = DeviceEventEmitter.addListener('TimestampEvent', (newTimestamp: string) => {
-            
-            setLocalTime(newTimestamp);
-
-        });
-
-
-        return () => {
-            TimestampModule.stopTimestampUpdates(); 
-            subscription.remove(); 
-        };
-
-    }, []);
 
 
     const fetchLocation = async () => {
@@ -112,8 +108,8 @@ function Home({ navigation, route } : {navigation:any, route: any}): React.JSX.E
 
     const productList = isOffline ? cachedProducts : products;
 
-    const formattedTimestamp = localTime
-        ? moment(Number(localTime)).format('MMMM Do YYYY, h:mm:ss a')
+    const formattedTimestamp = timestamp
+        ? moment(Number(timestamp)).format('MMMM Do YYYY, h:mm:ss a')
         : 'Waiting for timestamp...';
 
     return (
