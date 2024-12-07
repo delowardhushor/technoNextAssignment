@@ -2,7 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
     Alert,
+    DeviceEventEmitter,
     FlatList,
+    NativeModules,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -31,6 +33,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { RequestLocationPermission } from '../uti/uti';
 import Geolocation from '@react-native-community/geolocation';
 
+const { TimestampModule } = NativeModules;
 
 
 function Home({ navigation, route }): React.JSX.Element {
@@ -44,9 +47,31 @@ function Home({ navigation, route }): React.JSX.Element {
 
     const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
+    const [localTime, setLocalTime] = useState<string>('');
+
     useEffect(() => {
         fetchLocation()
     }, [])
+
+    useEffect(() => {
+        // Start the timestamp updates
+        TimestampModule.startTimestampUpdates();
+
+        // Listen to the timestamp events
+        const subscription = DeviceEventEmitter.addListener('TimestampEvent', (newTimestamp: string) => {
+            setLocalTime(newTimestamp);
+
+    console.log("localTime", newTimestamp)
+
+        });
+
+        // Cleanup on unmount
+        return () => {
+            TimestampModule.stopTimestampUpdates(); // Stop updates
+            subscription.remove(); // Remove event listener
+        };
+    }, []);
+
 
     const fetchLocation = async () => {
         // (requestLocationPermission logic as earlier)
@@ -66,7 +91,7 @@ function Home({ navigation, route }): React.JSX.Element {
         );
       };
 
-      console.log("Location", location)
+    //   console.log("Location", location)
 
     const styles = useMemo(() => GetStyles(colors), [activeTheme])
 
@@ -98,7 +123,7 @@ function Home({ navigation, route }): React.JSX.Element {
             >
                 
                 <CustomText>Products</CustomText>
-                
+
                 <TouchableOpacity
                     style={{
                         height:40,

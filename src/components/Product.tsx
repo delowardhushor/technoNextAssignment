@@ -25,7 +25,7 @@ import Chip from './Chip';
 import { useNavigation } from '@react-navigation/native';
 import CustomImage from './CustomImage';
 import _ from 'lodash'
-import { addToCart } from '../redux/cartSlice';
+import { addToCart, removeFromCart } from '../redux/cartSlice';
 import { CheckInCart } from '../uti/uti';
 import { useSelector } from 'react-redux';
 
@@ -45,15 +45,18 @@ function Product({ productWidth, productData }): React.JSX.Element {
     const InCart = useAppSelector(state => CheckInCart(state, productData?.id))
 
     const HandleCart = () => {
-        dispatch(
-            addToCart({
-              id: productData.id,
-              title: productData.title,
-              image: productData.image,
-              price: productData.price,
-              quantity: 1,
-            })
-        )
+        InCart ?
+            dispatch(removeFromCart(productData?.id))
+        :
+            dispatch(
+                addToCart({
+                    id: productData.id,
+                    title: productData.title,
+                    image: productData.image,
+                    price: productData.price,
+                    quantity: 1,
+                })
+            )
     }
 
     return (

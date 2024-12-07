@@ -45,7 +45,7 @@ function Header({location}): React.JSX.Element {
                 <Spacing horizontal={5} />
 
                 <View>
-                    <IconButton icon="bag-handle-outline" />
+                    <IconButton icon="bag-handle-outline" onPress={() => navigation.navigate('Cart')} />
                     <Badge value={cartItems?.length} />
                 </View>
             </View>
