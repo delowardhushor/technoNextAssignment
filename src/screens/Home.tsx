@@ -6,6 +6,7 @@ import {
     DeviceEventEmitter,
     FlatList,
     NativeModules,
+    Platform,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -54,17 +55,33 @@ function Home({ navigation, route } : {navigation:any, route: any}): React.JSX.E
 
     useEffect(() => {
 
-        TimestampModule.startTimestampUpdates();
-        const subscription = DeviceEventEmitter.addListener('TimestampEvent', (newTimestamp: string) => {
-            
-            setTimestamp(newTimestamp);
+        if(Platform.OS == 'android'){
 
-        });
+            TimestampModule?.startTimestampUpdates();
 
-        return () => {
-            TimestampModule.stopTimestampUpdates(); 
-            subscription.remove(); 
-        };
+            const subscription = DeviceEventEmitter.addListener('TimestampEvent', (newTimestamp: string) => {
+                
+                setTimestamp(newTimestamp);
+
+            });
+
+            return () => {
+                TimestampModule?.stopTimestampUpdates(); 
+                subscription?.remove(); 
+            };
+    
+        }else{
+            startTimestampUpdates();
+
+            const unsubscribe = onTimestampUpdate((ts) => {
+                setTimestamp(ts);
+            });
+
+            return () => {
+                unsubscribe();
+                stopTimestampUpdates();
+            };
+        }
 
     }, []);
 
