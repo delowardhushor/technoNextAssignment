@@ -10,7 +10,7 @@ import {
   Dimensions,
   View,
 } from 'react-native';
-import { useAppDispatch } from '../redux/storeHooks';
+import { useAppDispatch, useAppSelector } from '../redux/storeHooks';
 import { useTheme } from '../themes';
 import { UpdateTheme } from '../redux/settingSlice';
 
@@ -28,11 +28,13 @@ function Header({location}): React.JSX.Element {
     const {colors, activeTheme} = useTheme()
     const styles = useMemo(() => GetStyles(colors), [activeTheme])
     const navigation = useNavigation();
+    const cartItems = useAppSelector(state => state?.cart?.items)
+
 
 
     return (
         <View style={[styles.header]} >
-            <CustomText>LOGO</CustomText>
+            <CustomText>Techno Com</CustomText>
             <View style={{flexDirection:'row'}} >
 
                 <IconButton 
@@ -44,7 +46,7 @@ function Header({location}): React.JSX.Element {
 
                 <View>
                     <IconButton icon="bag-handle-outline" />
-                    <Badge value={5} />
+                    <Badge value={cartItems?.length} />
                 </View>
             </View>
         </View>

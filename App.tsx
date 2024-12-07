@@ -21,7 +21,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import StackNavs from './src/navigations/StackNavs';
 import { useTheme } from './src/themes';
 import { Provider } from 'react-redux'
-import { store } from './src/redux/store';
+import { persistor, store } from './src/redux/store';
+import { PersistGate } from 'redux-persist/integration/react';
 
 
 
@@ -37,8 +38,11 @@ function App(): React.JSX.Element {
 
   return (
     <SafeAreaProvider>
+      
       <Provider store={store} >
-        <StackNavs />
+        <PersistGate loading={null} persistor={persistor} >
+          <StackNavs />
+        </PersistGate>
       </Provider>
     </SafeAreaProvider>
   );

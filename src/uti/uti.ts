@@ -1,5 +1,6 @@
 import { RootState } from "../redux/store";
 import { PermissionsAndroid, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export function  ConvertSectoDay(n : number){
@@ -49,3 +50,31 @@ export async function RequestLocationPermission(){
   return true;
 }
 
+
+export const SaveViewedProducts = async (products: any[]) => {
+  try {
+    await AsyncStorage.setItem('pro_history', JSON.stringify(products));
+  } catch (error) {
+    console.error('Failed to save viewed products', error);
+  }
+};
+
+export const GetViewedProducts = async (): Promise<any[]> => {
+  try {
+    const data = await AsyncStorage.getItem("pro_history");
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Failed to retrieve viewed products', error);
+    return [];
+  }
+};
+
+export async function AddProductToHistory(product: any){
+
+  const currentHistory = await GetViewedProducts();
+
+  const updatedHistory = [product, ...currentHistory.filter(p => p.id !== product.id)];
+
+  await SaveViewedProducts(updatedHistory);
+  
+};

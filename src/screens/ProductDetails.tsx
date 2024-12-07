@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
 Pressable,
@@ -28,13 +28,17 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import Button from '../components/Button';
 import ProductCarousel from '../components/ProductCarousel';
 import Product from '../components/Product';
+import { AddProductToHistory } from '../uti/uti';
+import { addToHistory } from '../redux/historySlice';
 
 
-function ProductDetails({navigation}): React.JSX.Element {
+function ProductDetails({navigation, route} : {navigation:any, route: any}): React.JSX.Element {
 
     const dispatch = useAppDispatch()
     const {colors, activeTheme} = useTheme()   
     const {width} = useWindowDimensions() 
+
+    const {productData} = route?.params
 
     const insets = useSafeAreaInsets()
     const styles = useMemo(() => GetStyles(colors), [activeTheme])
@@ -50,6 +54,13 @@ function ProductDetails({navigation}): React.JSX.Element {
 
     }
 
+
+    useEffect(() => {
+
+        dispatch(addToHistory(productData));
+
+      }, []);
+
     return (
         <View style={{flex:1, backgroundColor:colors.background}} >
             <ScrollView
@@ -57,15 +68,15 @@ function ProductDetails({navigation}): React.JSX.Element {
                 overScrollMode="never"
             >
 
-                {/* <CustomImage 
-                    source={{uri:"https://cdn.thewirecutter.com/wp-content/media/2024/05/running-shoes-2048px-9718.jpg"}}
+                <CustomImage 
+                    source={{uri:productData?.image}}
                     style={{
                         height:width*.8,
                         width:width,
                     }}
-                /> */}
+                    resizeMode="contain"
+                />
 
-                <ProductCarousel />
 
                 <View style={styles.detailsSection} >
 
@@ -77,7 +88,7 @@ function ProductDetails({navigation}): React.JSX.Element {
                             size={20} 
                             numberOfLines={2} 
                         >
-                            Sport Shoes zsd asdasdasdasd asdas das dasd asd adsa
+                            {productData?.title}
                         </CustomText>
                         <IconButton 
                             icon="share-social-outline"
@@ -110,224 +121,6 @@ function ProductDetails({navigation}): React.JSX.Element {
 
                     <Spacing vertical={20} />
 
-                    <View style={{flexDirection:'row'}} >
-                        <View style={{flex:1}} >
-                            <CustomText size={18} type="bold" >
-                                Colors
-                            </CustomText>
-        
-                            <Spacing vertical={10} />
-
-                            <View style={{flexDirection:'row', flexWrap:'wrap', flex:1}} >
-                                {['red', 'black', 'blue', 'white'].map(ele => 
-                                    <Pressable 
-                                        style={{
-                                            height:30, 
-                                            width:30, 
-                                            marginRight:10, 
-                                            marginBottom:10, 
-                                            backgroundColor:ele, 
-                                            borderRadius:20,
-                                            borderWidth:1,
-                                            borderColor:colors.border,
-                                            overflow: 'hidden'
-                                        }} 
-                                        onPress={() => SetselectedColor(ele)}
-                                    >
-                                        {selectedColor == ele ? 
-                                            <View
-                                                style={{
-                                                    height:30, 
-                                                    width:30, 
-                                                    alignItems: 'center',
-                                                    justifyContent:'center',
-                                                    backgroundColor:'rgba(255,255,255,0.5)'
-                                                }}
-                                            >
-                                                <Ionicons size={18} name="checkmark-sharp" color={colors.black} />
-                                            </View>
-                                        : null }
-                                    </Pressable>
-                                )}
-                            </View>
-                        </View>
-                        <View style={{flex:1}} >
-
-                            <CustomText size={18} type="bold" >
-                                Size
-                            </CustomText>
-
-                            <Spacing vertical={10} />
-
-                            <View style={{flexDirection:'row', flexWrap:'wrap', flex:1}} >
-                                {['S', 'M', 'L', 'XL'].map(ele => 
-                                    <Chip 
-                                        label={ele}
-                                        onPress={() => SetselectedSize(ele)}
-                                        active={ele === selectedSize}
-                                        style={{
-                                            borderWidth:1,
-                                            borderColor:colors.base,
-                                            marginRight:10,
-                                            marginBottom:10
-                                        }}
-                                    />
-                                )}
-                            </View>
-                        </View>
-
-                    </View>
-
-                    <Spacing vertical={20} />
-
-                    <Hr />
-
-                    <Spacing vertical={20} />
-
-                    <View style={globalStyles.rowCenterBetween} >
-                        <CustomText size={18} type="bold" >
-                            Reviews & Ratings
-                        </CustomText>
-                        <Pressable>
-                            <CustomText size={18} color={colors.lightFont} >
-                                View All
-                            </CustomText>
-                        </Pressable>
-                    </View>
-
-                    <Spacing vertical={15} />
-
-                    <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center'}} >
-                        <View style={{alignItems:'center', justifyContent:'center', width:150}} >
-                            <CustomText size={60} type='boldRound' >4.8</CustomText>
-                            {/* <Spacing vertical={10} /> */}
-                            <ReviewStars value={3.6} />
-                            <Spacing vertical={10} />
-                            <CustomText  type='light' >2.5K Reviews</CustomText>
-
-                        </View>
-
-                        <View style={{ flex:1}} >
-
-                            {[1200,1400,1000,500,300].map((ele , index) => 
-
-                                <View style={{flexDirection:'row', alignItems:'center', height:25}} >
-                                    <Ionicons 
-                                        name='star'
-                                        color={colors.base}
-                                    />
-                                    <Spacing horizontal={5} />
-                                    <CustomText>{(index - 5)*-1}</CustomText>
-                                    <Spacing horizontal={10} />
-
-                                    <View style={{flex:1, backgroundColor:colors.border, height:10, flexDirection:'row', borderRadius:10, overflow:'hidden'}} >
-                                        <View style={{backgroundColor:colors.base, flex:index/10, borderRadius:20}} />
-                                    </View>
-                                    <Spacing horizontal={10} />
-                                    <View style={{width:30}} >
-                                        <CustomText size={10} type='bold' >1.5K</CustomText>
-                                    </View>
-                                </View>
-
-                            )}
-                                                    
-                        </View>
-                    </View>
-
-                    <Spacing vertical={20} />
-
-                    <Hr />
-
-                    <Spacing vertical={20} />
-
-                    <CustomText size={18} type="bold" >
-                        Saler Informations
-                    </CustomText>
-
-                    <Spacing vertical={10} />
-
-
-                    <View style={[styles.shop, globalStyles.shadow]} >
-
-                        <CustomImage 
-                            source={{uri:"https://cdn.thewirecutter.com/wp-content/media/2024/05/running-shoes-2048px-9718.jpg"}}
-                            style={{
-                                height:110,
-                                width:110,
-                                borderRadius:10,
-                                overflow: 'hidden'
-                            }}
-                        />
-                        <Spacing horizontal={10} />
-
-                        
-
-                        <View style={{flex:1}} >
-
-                            <CustomText size={16} type="bold" >
-                                Urban Fashions
-                            </CustomText>
-                           
-
-                            <Spacing vertical={5} />
-
-                            <View style={globalStyles.rowCenter}>
-                                <ReviewStars value={4} />
-                                <Spacing horizontal={5} />
-                                <CustomText size={12} type='bold' >
-                                    4.8 (2.4K Reviews)
-                                </CustomText>
-                            </View>
-
-                            <Spacing vertical={10} />
-
-                            {/* <ReviewStars value={4} /> */}
-
-                            <View style={{flexDirection:'row'}} >
-                                <View style={[styles.sold, {flex:1}]} >
-                                    <CustomText size={12} type='bold' >
-                                        23 Products
-                                    </CustomText>
-                                </View>
-                                <Spacing horizontal={5} />
-                                <View style={[styles.sold, {flex:1}]} >
-                                    <CustomText size={12} type='bold' >
-                                        8.2K item sold
-                                    </CustomText>
-                                </View>
-                            </View>
-
-                            <Spacing vertical={10} />
-
-                            <View style={{flexDirection:'row', alignItems:'center', justifyContent:'flex-end', flexWrap:'wrap'}} >
-
-                                <IconButton 
-                                    icon="chatbubble-outline"
-                                    style={[globalStyles.shadow, {height:25, width:25}]}
-                                    size={14}
-                                />
-
-                                <Spacing horizontal={10} />
-                                
-                                <Chip 
-                                    leftIcon="eye"
-                                    label="Visit Shop"
-                                    active
-                                />
-
-                            </View>
-
-
-                        </View>
-                        
-                    </View>
-
-                    <Spacing vertical={20} />
-
-                    <Hr />
-
-                    <Spacing vertical={20} />
-
 
                     <CustomText size={18} type="bold" >
                         Descriptions
@@ -336,9 +129,7 @@ function ProductDetails({navigation}): React.JSX.Element {
                     <Spacing vertical={10} />
 
                     <CustomText type='light' >
-                        This sport shoes is made from premium leather and features a waterproof sole for a comfortable and dry fit. It is equipped with a 1.5 inch thick heel for added support and a 2.5 inch heel for a more comfortable fit.
-                        {"\n"}
-                        This sport shoes is made from premium leather and features a waterproof sole for a comfortable and dry fit. It is equipped with a 1.5 inch thick heel for added support and a 2.5 inch heel for a more comfortable fit.
+                        {productData?.description}
                     </CustomText>
 
                     <Spacing vertical={20} />
@@ -353,24 +144,7 @@ function ProductDetails({navigation}): React.JSX.Element {
                 <Spacing vertical={5} />
 
 
-                <View>
-                    <View style={globalStyles.globalPadding} >
-                        <CustomText size={18} type="bold" >
-                            Recommened For you
-                        </CustomText>
-                    </View>
-
-                    <Spacing vertical={10} />
-                    
-                    <FlatList 
-                        style={globalStyles.globalPadding}
-                        data={[1,1,1,1]}
-                        numColumns={2}
-                        renderItem={({item}) => 
-                            <Product />   
-                        }
-                    />
-                </View>
+                
 
                 {/* <Image 
                     source={require("./../assets/images/light-layer.png")}
@@ -415,22 +189,7 @@ function ProductDetails({navigation}): React.JSX.Element {
                     right:0,
                 }}
             >
-                {/* <Spacing vertical={10} /> */}
-                {/* <View
-                    pointerEvents="none"
-                >
-                    <Image 
-                        source={require("./../assets/images/light-layer.png")}
-                        style={{
-                            // height:width/3.1,
-                            height:30,
-                            width:width,
-                            marginBottom:-2
-                        }}
-                        resizeMode='stretch'
-
-                    />
-                </View> */}
+               
                     
             
                 <View style={{backgroundColor:colors.background,paddingHorizontal:15, flexDirection:'row', alignItems:'center', justifyContent:'space-between', height:40}} >
@@ -498,7 +257,11 @@ function ProductDetails({navigation}): React.JSX.Element {
 
                     <Spacing horizontal={15} />
 
-                    <CustomText style={{color:colors.font, opacity:scrollPosition * 2 / width}} type="bold" size={16} >Nice Shoes</CustomText>
+                    <View style={{flex:1}} >
+                        <CustomText numberOfLines={1} style={{color:colors.font, opacity:scrollPosition * 2 / width}} type="bold" size={16} >{productData?.title}</CustomText>
+
+                    </View>
+
 
                 </View>
 

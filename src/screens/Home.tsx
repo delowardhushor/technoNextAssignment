@@ -98,6 +98,7 @@ function Home({ navigation, route }): React.JSX.Element {
             >
                 
                 <CustomText>Products</CustomText>
+                
                 <TouchableOpacity
                     style={{
                         height:40,

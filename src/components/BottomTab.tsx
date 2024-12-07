@@ -51,20 +51,11 @@ function BottomTab({ state, descriptors, navigation }) {
             if(route.name === 'Home'){
                 return 'home'
             }
-            if(route.name === 'Shops'){
-                return 'archive'
+            if(route.name === 'History'){
+                return 'clock'
             }
             if(route.name === 'Cart'){
                 return 'shopping-cart'
-            }
-            if(route.name === 'Profile'){
-                return 'user'
-            }
-            if(route.name === 'Settings'){
-                return 'settings'
-            }
-            if(route.name === 'Account'){
-                return 'user'
             }
             return 'home'  // default icon name when no icon is found
         }

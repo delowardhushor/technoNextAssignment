@@ -59,7 +59,7 @@ function Product({ productWidth, productData }): React.JSX.Element {
     return (
         <Pressable 
             style={[globalStyles.shadow, styles.product, {width:calculatedWidth}]} 
-            onPress={() => navigation.navigate("ProductDetails")}
+            onPress={() => navigation.push("ProductDetails", {productData})}
         >
             <View>
                 <CustomImage
