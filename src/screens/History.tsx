@@ -53,6 +53,13 @@ function History({ navigation, route }): React.JSX.Element {
             <FlatList
                 style={globalStyles.globalPadding}
                 data={history}
+                ListEmptyComponent={
+                    <View style={{marginTop:100}} >
+                        <CustomText style={{textAlign:'center'}} type="bold" size={20} >No Product in history</CustomText>
+                        <Spacing vertical={5} />
+                        <CustomText style={{textAlign:'center'}} type="bold" color={colors.lightFont} >You will find recently viewed products here</CustomText>
+                    </View>
+                }
                 numColumns={2}
                 renderItem={({ item }) =>
                     <Product 

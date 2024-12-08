@@ -70,17 +70,6 @@ function Home({ navigation, route } : {navigation:any, route: any}): React.JSX.E
                 subscription?.remove(); 
             };
     
-        }else{
-            startTimestampUpdates();
-
-            const unsubscribe = onTimestampUpdate((ts) => {
-                setTimestamp(ts);
-            });
-
-            return () => {
-                unsubscribe();
-                stopTimestampUpdates();
-            };
         }
 
     }, []);
