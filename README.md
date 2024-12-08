@@ -1,79 +1,147 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-# Getting Started
+# **TechnoNextAssignment**
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+A React Native application for an e-commerce catalog with product listing, cart management, offline support, and a native timestamp module.
 
-## Step 1: Start the Metro Server
+## **Features**
+1. **Phase 1:**
+   - Product listing (10 products).
+   - Ascending/descending sorting.
+   - Geolocation tracking and display on a map.
+   - Product details screen.
+   - Cart management (add, remove, quantity adjustment).
+   
+2. **Phase 2:**
+   - Offline mode with cached product history.
+   - View previously visited products in offline mode.
+   - Handle network changes gracefully.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+3. **Phase 3:**
+   - Native timestamp module.
+   - Periodic updates every 20 seconds with timestamp display on the home screen.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+---
 
+## **Prerequisites**
+- **Node.js:** v16.x or later.
+- **Yarn:** Recommended (optional, you can use `npm`).
+- **React Native CLI** or **Expo CLI** (if using Expo).
+- **Android Studio** (for Android builds).
+- **Xcode** (for iOS builds).
+
+---
+
+## **Setup Instructions**
+
+### 1. Clone the Repository
 ```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
+git clone https://github.com/delowardhushor/technoNextAssignment
+cd technoNextAssignment
 ```
 
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
+### 2. Install Dependencies
 ```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
+yarn install
+```
+or
+```bash
+npm install
 ```
 
-### For iOS
+---
 
+### 3. Run the Application
+
+#### **For Android:**
+1. Start the Metro bundler:
+   ```bash
+   npx react-native start
+   ```
+2. Run the app on an Android emulator or device:
+   ```bash
+   npx react-native run-android
+   ```
+
+#### **For iOS:**
+1. Install CocoaPods dependencies:
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+2. Run the app on an iOS simulator or device:
+   ```bash
+   npx react-native run-ios
+   ```
+
+#### **Run Metro with Cache Reset (if necessary):**
 ```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+npx react-native start --reset-cache
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+---
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+### 4. Native Modules (TimestampModule)
 
-## Step 3: Modifying your App
+#### **For Android:**
+The native module is already integrated. No additional setup is required.
 
-Now that you have successfully run the app, let's modify it.
+#### **For iOS:**
+Ensure you’ve set up your Xcode environment:
+1. Open `ios/TechnoNextAssignment.xcworkspace` in Xcode.
+2. Build the project (`Command + B`).
+3. Run the app on the simulator or device.
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+---
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+### 5. Environment Variables
+If using Google Maps or other APIs, ensure to add your API keys:
+1. **Android:**  
+   Add your API key in `android/app/src/main/AndroidManifest.xml`.
+2. **iOS:**  
+   Add your API key in `AppDelegate.m` or `.plist` file.
 
-## Congratulations! :tada:
+---
 
-You've successfully run and modified your React Native App. :partying_face:
+## **Build and Package**
 
-### Now what?
+### **Android (APK or AAB):**
+1. Generate a release APK:
+   ```bash
+   cd android
+   ./gradlew assembleRelease
+   ```
+   The APK will be located in `android/app/build/outputs/apk/release/`.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+2. Generate an AAB:
+   ```bash
+   ./gradlew bundleRelease
+   ```
+   The AAB will be located in `android/app/build/outputs/bundle/release/`.
 
-# Troubleshooting
+---
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### **iOS:**
+1. Open `ios/TechnoNextAssignment.xcworkspace` in Xcode.
+2. Set the build scheme to `Release`.
+3. Archive the project (`Product > Archive`) and export the `.ipa` file.
 
-# Learn More
+---
 
-To learn more about React Native, take a look at the following resources:
+## **Additional Notes**
+1. **Redux Persist:** Handles offline caching for product history.
+2. **Geolocation Permissions:** Ensure location permissions are enabled in the app settings.
+3. **Network Status Handling:** Implemented using `@react-native-community/netinfo`.
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+
+## **Troubleshooting**
+- **Invalid date in timestamp module:** Ensure the native module is correctly registered, and you're using a supported date formatter like `moment` or `date-fns`.
+- **Native module issues:** Clear the Metro bundler cache:
+  ```bash
+  npx react-native start --reset-cache
+  ```
+- **Permission issues:** Verify location and network permissions in both Android and iOS settings.
+
+---
+
+## **Contact**
+For any questions or issues, contact **[Your Name]** at **your-email@example.com**.
